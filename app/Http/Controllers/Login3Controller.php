@@ -3,47 +3,71 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Services\Business\SecurityService;
-use App\User;
 use App\Models\UserModel;
 
 class Login3Controller extends Controller
 {
     public function index(Request $request)
     {
-        // Usage of path method
-        $path = $request->path();
-        echo 'Path Method:' . $path;
-        echo '<br>';
-        
-        // Usage of url method
-        $url = $request->url();
-        echo 'URL method: '.$url;
-        echo '<br>';
-        
-        // Usage of is method
-        $method = $request->isMethod('get') ? "GET" : "POST";
-        echo 'GET or POST Method: '.$method;
-        echo '<br>';
+        Log::info("Entering LoginController::index()");
         
         $userName = $request->input('userName');
         $password = $request->input('password');
-        echo "Username: " . $userName . " Password: " . $password;
-        echo '<br>';
+        
+        Log::info("Parameters are: ", array("username" => $userName, "password"=>$password));
+        
+        if($userName == null || $password == null)
+        {
+            Log::info("Exit LoginController::index() with login failing");
+            
+            
+            if($userName == null)
+            {
+                $cache = Cache::get('mydata');
+                if($cache == null)
+                    Log::info("Username in Cache not available.");
+                else 
+                    Log::info("Username: " . $cache . " was found in Cache.");
+            }
+            return view('loginFailed');
+        }
+        
+        // Cahs the username in Laravel File Cache
+        Cache::put('mydata', $userName, 60);
+        Log::info("Username: " . $userName ." was put into Laravel File Cache for 60 seconds.");
+        
         
         // Validate the Form Data 
         // Will redirect user back to login view if there are errors
-        $this->validateForm($request);
+        
+        Log::info("Form validation is disabled");
+        //Log::info("Form data starts being validated");
+        //$this->validateForm($request);
+        //Log::info("Form data finnishes being validated");
         
         $user = new UserModel($userName, $password);
         $secSer = new SecurityService();  
         
+        Log::info("User creditals are being checked against the user table");
         $result = $secSer->login($user);
         echo "Account is real: " . $result;
         
+        Log::info("Security Service returns " . $result);
+        
         $data = ['user' => $user];
-        if($result) return view('loginPassed2')->with($data);
-        else return view('loginFailed');
+        if($result) 
+        {
+            Log::info("Exit LoginController::index() with login passing");
+            return view('loginPassed2')->with($data);
+        }
+        else 
+        {
+            Log::info("Exit LoginController::index() with login failing");
+            return view('loginFailed');
+        }
     }
     
     private function validateForm(Request $request)
@@ -51,12 +75,13 @@ class Login3Controller extends Controller
         // Data Validation Rules
         $rules = 
         [
-            'username' => 'Required | Between:4,10 | Alpha',
+            //'username' => 'Required | Between:4,10 | Alpha',
+            'username' => 'Required | Between:4,10',
             'password' => 'Required | Between:4,10'
         ];
-        
+        Log::info("Current Validation Rules: ", $rules);
         // Run Data Validation Rules
-        $this->validate($request, $rules);
+        Log::info("Validation Rules result: ", $this->validate($request, $rules));
     }
     
     

@@ -7,6 +7,7 @@ use App\Services\Data\SecurityDAO;
 use App\Services\Data\CustomerDAO;
 use App\Models\CustomerModel;
 use App\Services\Data\OrderDAO;
+use Illuminate\Support\Facades\Log;
 
 class SecurityService
 {
@@ -23,6 +24,7 @@ class SecurityService
     
     public function login(UserModel $user)
     {
+        Log::info("Entered login()");
         return $this->secDAO->DoesUserExist($user);
     }
     
@@ -34,6 +36,16 @@ class SecurityService
     public function addOrder(OrderModel $order)
     {
         return $this->orderDAO->addOrder($order);
+    }
+
+    public function findAllUsers()
+    {
+        $this->secDAO->FindAllUsers();
+    }
+
+    public function findUserByID(int $id)
+    {
+        return $this->secDAO->FindUserByID($id);
     }
 }
 

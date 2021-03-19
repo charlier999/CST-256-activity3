@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-class UserModel
+class UserModel implements \JsonSerializable
 {
 
     private string $username;
@@ -30,6 +30,11 @@ class UserModel
     {
         return $this->password;
     }
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
+
 
 
     
