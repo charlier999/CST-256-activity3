@@ -56,6 +56,38 @@ class SecurityDAO
         );        
     }
     
+    public function DoesUserExistByID(int $userID)
+    {
+        Log::info("Entered DoesUserExistByID()");
+        try {
+            // Create a sql query
+            $query = "SELECT * FROM user WHERE ID='" . $userID . "'";
+            
+            Log::info("Querrying database in DoesUserExistByID() with: ". $query);
+            
+            // Query the sql query
+            $result = mysqli_query($this->link, $query);
+            
+            // Get the number of rows from the result
+            $numRows = mysqli_num_rows($result);
+            
+            Log::info("The number of rows retrived by query '" . $query . "' is " . $numRows);
+            
+            // Check to see if there is no rows in the result
+            if($numRows == 0) return FALSE;
+            else if($numRows == 1) return TRUE;
+            else return FALSE;
+            
+            if($result) return TRUE;
+            else return FALSE;
+        }
+        catch (Exception $e)
+        {
+            Log::error("EXCEPTION: DoesUserExistByID()");
+            return FALSE;
+        }
+    }
+    
     public function DoesUserExist(UserModel $user)
     {
         Log::info("Entered DoesUserExist()");
@@ -86,7 +118,39 @@ class SecurityDAO
             Log::error("EXCEPTION: DoesUserExist()");
             return FALSE;
         }
-        
+    }
+    
+    public function FindUserIDByUNnPW(string $userName, string $password)
+    {
+        Log::info("Entered FindUserByUNnPW() with paramaters UserName: " . $userName . " Password: " . $password);
+        try {
+            // Create a sql query
+            $query = "SELECT * FROM user WHERE UserName='" . $userName . "'AND Password='" . $password . "'";
+            
+            Log::info("Querrying database in FindUserByUNnPW() with: ". $query);
+            
+            // Query the sql query
+            $result = mysqli_query($this->link, $query);
+            
+            // Get the number of rows from the result
+            $numRows = mysqli_num_rows($result);
+            
+            Log::info("The number of rows retrived by query '" . $query . "' is " . $numRows);
+            
+            // Check to see if there is no rows in the result
+            if($numRows == 0) return FALSE;
+            else if($numRows == 1)
+            {
+                $row = mysqli_fetch_array($result);
+                return $row[0];
+            }
+            else return FALSE;
+        }
+        catch (Exception $e)
+        {
+            Log::error("EXCEPTION: FindUserByUNnPW()");
+            return FALSE;
+        }
     }
 
     public function FindUserByID(int $id)

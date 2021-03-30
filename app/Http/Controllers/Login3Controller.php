@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use App\Services\Business\SecurityService;
 use App\Models\UserModel;
+use Carbon\Exceptions\Exception;
 
 class Login3Controller extends Controller
 {
+    public function __constructor()
+    {
+        try {} catch (Exception $e) 
+        {
+            Log::error("Exception Occured in Login3Controller constructor. Exception:" . $e);
+        }
+    }
+    
     public function index(Request $request)
     {
         Log::info("Entering LoginController::index()");
@@ -61,6 +71,7 @@ class Login3Controller extends Controller
         if($result) 
         {
             Log::info("Exit LoginController::index() with login passing");
+            Cookie::forever('userID', $secSer->FindUserIDByUNnPW($userName, $password));
             return view('loginPassed2')->with($data);
         }
         else 

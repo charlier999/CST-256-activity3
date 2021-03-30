@@ -22,6 +22,11 @@ class SecurityService
         $this->orderDAO = new OrderDAO();
     }
     
+    public function DoesUserExistByID(int $userID)
+    {
+        return $this->secDAO->DoesUserExistByID($userID);
+    }
+    
     public function login(UserModel $user)
     {
         Log::info("Entered login()");
@@ -41,6 +46,11 @@ class SecurityService
     public function findAllUsers()
     {
         $this->secDAO->FindAllUsers();
+    }
+    
+    public function FindUserIDByUNnPW(string $userName, string $password)
+    {
+        return $this->secDAO->FindUserByUNnPW($userName, $password);
     }
 
     public function findUserByID(int $id)
